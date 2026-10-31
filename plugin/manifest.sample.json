@@ -1,0 +1,10 @@
+{
+  "name": "Flow Forge",
+  "id": "REPLACE_WITH_ID_FIGMA_GIVES_YOU_WHEN_YOU_CREATE_A_PLUGIN",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["none"] }
+}

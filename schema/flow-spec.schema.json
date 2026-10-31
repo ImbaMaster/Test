@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flow-forge.local/schema/flow-spec.schema.json",
+  "title": "FlowSpec",
+  "description": "Authoring contract. Describes WHAT is in a flow (nodes, edges, phases) with no coordinates. A human or an AI writes this. The layout step turns it into a RenderPlan.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "name", "phases", "nodes", "edges"],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "name": { "type": "string", "minLength": 1 },
+    "phases": {
+      "description": "Vertical bands (swimlanes by stage or page), in left-to-right order.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/phase" }
+    },
+    "nodes": {
+      "description": "The FIRST node is the layout origin and must be the single 'start' node.",
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "edges": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/edge" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$" },
+    "side": { "enum": ["TOP", "BOTTOM", "LEFT", "RIGHT"] },
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "phase"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["start", "end", "process", "error", "success", "screen", "decision", "note"] },
+        "phase": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "description": "Small caps tag on process/error/success nodes, e.g. System, PSP, Error." },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "text": { "type": "string", "minLength": 1 },
+        "attach": { "$ref": "#/$defs/id" },
+        "hint": {
+          "description": "Optional manual grid position (column,row). Row grows downward; the origin node is 0,0. Use sparingly: every hint is layout debt.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["col", "row"],
+          "properties": { "col": { "type": "integer" }, "row": { "type": "integer" } }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "enum": ["start", "end", "decision", "process", "error", "success"] } } }, "then": { "required": ["label"] } },
+        { "if": { "properties": { "type": { "const": "screen" } } }, "then": { "required": ["title"] } },
+        { "if": { "properties": { "type": { "const": "note" } } }, "then": { "required": ["text", "attach"] } }
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "$ref": "#/$defs/id" },
+        "to": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "kind": { "enum": ["normal", "success", "error", "note"], "default": "normal" },
+        "loop": { "type": "boolean", "description": "True for back-edges (retry loops). They do not place nodes." },
+        "place": {
+          "enum": ["right", "below", "below-right", "above", "above-right"],
+          "description": "Where the TARGET goes relative to the source, if this edge is the one that places it. Default: right."
+        },
+        "fromSide": { "$ref": "#/$defs/side" },
+        "toSide": { "$ref": "#/$defs/side" }
+      },
+      "dependentRequired": { "fromSide": ["toSide"], "toSide": ["fromSide"] }
+    }
+  }
+}

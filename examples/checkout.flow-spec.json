@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1",
+  "name": "Checkout flow",
+  "phases": [
+    { "id": "cart", "title": "1 · Cart & identity" },
+    { "id": "shipping", "title": "2 · Shipping" },
+    { "id": "payment", "title": "3 · Payment" },
+    { "id": "complete", "title": "4 · Order complete" }
+  ],
+  "nodes": [
+    { "id": "start", "type": "start", "phase": "cart", "label": "Tap Checkout" },
+    { "id": "loggedIn", "type": "decision", "phase": "cart", "label": "Logged in?" },
+    { "id": "prefill", "type": "process", "phase": "cart", "tag": "System", "label": "Prefill saved address & payment" },
+    { "id": "signIn", "type": "screen", "phase": "cart", "title": "Sign in or continue as guest", "description": "Email + password, or guest email only" },
+    { "id": "shipping", "type": "screen", "phase": "shipping", "title": "Shipping details", "description": "Address, phone, delivery notes" },
+    { "id": "validate", "type": "process", "phase": "shipping", "tag": "System", "label": "Validate address" },
+    { "id": "addrOk", "type": "decision", "phase": "shipping", "label": "Address valid?" },
+    { "id": "addrErr", "type": "error", "phase": "shipping", "tag": "Error", "label": "Invalid address – show inline errors" },
+    { "id": "payment", "type": "screen", "phase": "payment", "title": "Payment", "description": "Card, wallet or bank transfer" },
+    { "id": "authorize", "type": "process", "phase": "payment", "tag": "PSP", "label": "Authorize payment" },
+    { "id": "payOk", "type": "decision", "phase": "payment", "label": "Payment approved?" },
+    { "id": "payErr", "type": "error", "phase": "payment", "tag": "Error", "label": "Payment declined – offer retry" },
+    { "id": "order", "type": "success", "phase": "complete", "tag": "System", "label": "Create order & send email" },
+    { "id": "confirm", "type": "screen", "phase": "complete", "title": "Order confirmation", "description": "Order number, summary, next steps" },
+    { "id": "end", "type": "end", "phase": "complete", "label": "Order placed" },
+    { "id": "noteGuest", "type": "note", "phase": "cart", "attach": "signIn", "text": "Guest orders: offer account creation on the confirmation screen." },
+    { "id": "noteRetry", "type": "note", "phase": "payment", "attach": "payErr", "text": "After 3 failed attempts, suggest another payment method or contact support." }
+  ],
+  "edges": [
+    { "from": "start", "to": "loggedIn" },
+    { "from": "loggedIn", "to": "prefill", "label": "Yes" },
+    { "from": "loggedIn", "to": "signIn", "label": "No", "place": "below-right" },
+    { "from": "prefill", "to": "shipping" },
+    { "from": "signIn", "to": "shipping", "label": "Continue" },
+    { "from": "shipping", "to": "validate", "label": "Submit" },
+    { "from": "validate", "to": "addrOk" },
+    { "from": "addrOk", "to": "addrErr", "label": "No", "kind": "error", "place": "below" },
+    { "from": "addrErr", "to": "shipping", "label": "Edit address", "kind": "error", "loop": true },
+    { "from": "addrOk", "to": "payment", "label": "Yes", "kind": "success" },
+    { "from": "payment", "to": "authorize", "label": "Pay" },
+    { "from": "authorize", "to": "payOk" },
+    { "from": "payOk", "to": "order", "label": "Yes", "kind": "success" },
+    { "from": "payOk", "to": "payErr", "label": "No", "kind": "error", "place": "below" },
+    { "from": "payErr", "to": "payment", "label": "Retry (max 3)", "kind": "error", "loop": true },
+    { "from": "order", "to": "confirm" },
+    { "from": "confirm", "to": "end" },
+    { "from": "noteGuest", "to": "signIn", "kind": "note" },
+    { "from": "noteRetry", "to": "payErr", "kind": "note" }
+  ]
+}

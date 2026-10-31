@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flow-forge.local/schema/render-plan.schema.json",
+  "title": "RenderPlan",
+  "description": "Plugin contract. Everything is already decided: absolute positions, sizes, connector sides. The Figma plugin only reads this and draws it. This is the JSON you paste into the plugin.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "name", "connectorMode", "frame", "phases", "nodes", "edges"],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "name": { "type": "string", "minLength": 1 },
+    "connectorMode": {
+      "enum": ["native", "vector"],
+      "description": "native = clone the seed CONNECTOR and attach it to nodes (editable, follows nodes). vector = draw each edge from edge.route (exact path, not attached)."
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": { "width": { "type": "number", "exclusiveMinimum": 0 }, "height": { "type": "number", "exclusiveMinimum": 0 } }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "x", "y", "width", "height"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "width": { "type": "number", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "exclusiveMinimum": 0 }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "x", "y", "width", "height", "props"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["start", "end", "process", "error", "success", "screen", "decision", "note"] },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "width": { "type": "number", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "exclusiveMinimum": 0 },
+          "props": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "label": { "type": "string" },
+              "tag": { "type": "string" },
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "text": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "from", "to", "fromSide", "toSide", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "fromSide": { "enum": ["TOP", "BOTTOM", "LEFT", "RIGHT"] },
+          "toSide": { "enum": ["TOP", "BOTTOM", "LEFT", "RIGHT"] },
+          "kind": { "enum": ["normal", "success", "error", "note"] },
+          "label": { "type": "string" },
+          "route": {
+            "description": "Points of the path, start to end. Required when connectorMode is 'vector'.",
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["x", "y"],
+              "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

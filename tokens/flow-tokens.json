@@ -1,0 +1,75 @@
+{
+  "_comment": "Source of truth for the flow kit. Values are exactly what was built in the Figma test file ('Flow kit test – Checkout'). PENDING RESTYLE: the user's own sign-in flow uses a teal look (see docs/02-FINDINGS.md). When the MCP limit resets, extract its real values and update this file; the plugin (M5) then rebuilds the kit from it.",
+  "version": "0.1.0",
+  "collections": {
+    "Flow / Color": {
+      "mode": "Default",
+      "variables": {
+        "canvas/bg": { "value": "#F5F6F8", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "band/bg": { "value": "#ECEFF4", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "band/text": { "value": "#5B6577", "scopes": ["TEXT_FILL"] },
+        "screen/bg": { "value": "#FFFFFF", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "screen/border": { "value": "#B8C0CC", "scopes": ["STROKE_COLOR"] },
+        "screen/placeholder": { "value": "#E3E7ED", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "action/bg": { "value": "#E8F0FE", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "action/border": { "value": "#3B82F6", "scopes": ["STROKE_COLOR"] },
+        "decision/bg": { "value": "#FFF4D6", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "decision/border": { "value": "#D99A00", "scopes": ["STROKE_COLOR"] },
+        "terminal/start-bg": { "value": "#1F2937", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "terminal/end-bg": { "value": "#15803D", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "error/bg": { "value": "#FDECEC", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "error/border": { "value": "#DC2626", "scopes": ["STROKE_COLOR"] },
+        "success/bg": { "value": "#E6F6EC", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "success/border": { "value": "#16A34A", "scopes": ["STROKE_COLOR"] },
+        "note/bg": { "value": "#FFF9C4", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "note/border": { "value": "#B59B00", "scopes": ["STROKE_COLOR"] },
+        "text/primary": { "value": "#111827", "scopes": ["TEXT_FILL"] },
+        "text/secondary": { "value": "#6B7280", "scopes": ["TEXT_FILL"] },
+        "text/inverse": { "value": "#FFFFFF", "scopes": ["TEXT_FILL"] },
+        "edge/default": { "value": "#4B5563", "scopes": ["STROKE_COLOR"] },
+        "edge/error": { "value": "#DC2626", "scopes": ["STROKE_COLOR"] },
+        "edge/success": { "value": "#16A34A", "scopes": ["STROKE_COLOR"] },
+        "edge/note": { "value": "#B59B00", "scopes": ["STROKE_COLOR"] },
+        "edge-label/bg": { "value": "#FFFFFF", "scopes": ["FRAME_FILL", "SHAPE_FILL"] },
+        "edge-label/border": { "value": "#CBD2DC", "scopes": ["STROKE_COLOR"] }
+      }
+    },
+    "Flow / Size": {
+      "mode": "Default",
+      "variables": {
+        "space/xs": { "value": 4, "scopes": ["GAP"] },
+        "space/sm": { "value": 8, "scopes": ["GAP"] },
+        "space/md": { "value": 16, "scopes": ["GAP"] },
+        "space/lg": { "value": 24, "scopes": ["GAP"] },
+        "radius/sm": { "value": 6, "scopes": ["CORNER_RADIUS"] },
+        "radius/md": { "value": 12, "scopes": ["CORNER_RADIUS"] },
+        "radius/pill": { "value": 999, "scopes": ["CORNER_RADIUS"] },
+        "stroke/default": { "value": 1.5, "scopes": ["STROKE_FLOAT"] },
+        "stroke/edge": { "value": 2, "scopes": ["STROKE_FLOAT"], "note": "Connectors CANNOT bind this variable (no setBoundVariable on CONNECTOR). The plugin must set strokeWeight = 2 as a plain number." }
+      }
+    }
+  },
+  "textStyles": {
+    "Flow/Label": { "family": "Inter", "style": "Medium", "size": 14, "lineHeightPx": 20 },
+    "Flow/Caption": { "family": "Inter", "style": "Regular", "size": 12, "lineHeightPx": 16 },
+    "Flow/Tag": { "family": "Inter", "style": "Semi Bold", "size": 10, "lineHeightPx": 12, "letterSpacingPx": 0.8, "textCase": "UPPER" }
+  },
+  "components": {
+    "Node/Terminal": { "variants": { "Type": ["Start", "End"] }, "props": ["Label"], "layout": "horizontal auto-layout, minWidth 150, padding H=space/lg V=space/md, radius pill, fill terminal/start-bg | terminal/end-bg, text Flow/Label in text/inverse" },
+    "Node/Action": { "variants": { "Type": ["Process", "Error", "Success"] }, "props": ["Tag", "Label"], "layout": "vertical auto-layout, fixed width 190, padding H=space/md V=space/sm, gap space/xs, radius radius/md, fill+stroke from action|error|success, Tag=Flow/Tag, Label=Flow/Label" },
+    "Node/Screen": { "props": ["Title", "Description"], "layout": "vertical, fixed width 220, padding space/md, gap space/sm, radius radius/md, fill screen/bg, stroke screen/border; children: Tag 'Screen', Title, 'Wireframe' placeholder (3 bars), Description (Flow/Caption)" },
+    "Node/Decision": { "props": ["Label"], "layout": "fixed 200x120, diamond vector (fill decision/bg, stroke decision/border), centered text 112 wide, Flow/Label" },
+    "Node/Note": { "props": ["Text"], "layout": "vertical, fixed width 220, dashed stroke [6,4] note/border, fill note/bg, radius radius/sm" },
+    "Edge/Label": { "props": ["Text"], "layout": "pill, fill edge-label/bg, stroke edge-label/border, Flow/Caption. NOT used with native connectors (connector text replaces it)." },
+    "Phase/Band": { "props": ["Title"], "layout": "vertical, fill band/bg, radius radius/md, padding space/md, Title in band/text. Instance is resized to cover its phase." }
+  },
+  "connectors": {
+    "lineType": "ELBOWED",
+    "weight": 2,
+    "startCap": "NONE",
+    "endCap": "ARROW_EQUILATERAL",
+    "noteEdges": { "endCap": "NONE", "dash": [6, 5] },
+    "labelText": { "family": "Inter", "style": "Regular", "size": 12, "color": "text/secondary" },
+    "colorByKind": { "normal": "edge/default", "success": "edge/success", "error": "edge/error", "note": "edge/note" }
+  }
+}

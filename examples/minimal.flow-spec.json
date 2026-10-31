@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1",
+  "name": "Minimal",
+  "phases": [{ "id": "p1", "title": "Test" }],
+  "nodes": [
+    { "id": "a", "type": "start", "phase": "p1", "label": "Start" },
+    { "id": "b", "type": "process", "phase": "p1", "tag": "System", "label": "Do something" },
+    { "id": "c", "type": "end", "phase": "p1", "label": "Done" }
+  ],
+  "edges": [
+    { "from": "a", "to": "b", "label": "go" },
+    { "from": "b", "to": "c" }
+  ]
+}
